@@ -1009,3 +1009,90 @@ SELECT
     (heurearrive - heuredepart) AS duree
 FROM
     etapeequipe order by duree;
+
+
+delete from equipecoureur
+
+delete from etapeequipe
+
+delete from etaperang
+
+delete from etape
+
+delete from equipe
+
+delete from coureur
+
+
+viewequipecoureur
+ SELECT equipe.idequipe,
+    equipe.nomequipe,
+    coureur.idcoureur,
+    coureur.nomcoureur,
+    coureur.numero,
+    coureur.datedenaissance,
+    categorie.idcate,
+    categorie.nomcate
+   FROM equipe
+     JOIN equipecoureur ON equipecoureur.idequipe = equipe.idequipe
+     JOIN coureur ON equipecoureur.idcoureur = coureur.idcoureur
+     JOIN categorie ON coureur.idcategorie = categorie.idcate;
+
+
+
+viewclassement
+ WITH rankedcoureurs AS (
+         SELECT e_1.idequipe,
+            e_1.idcoureur,
+            e_1.idetape,
+            e_1.heurearrive - e_1.heuredepart AS duree,
+            rank() OVER (PARTITION BY e_1.idetape ORDER BY (EXTRACT(epoch FROM e_1.heurearrive - e_1.heuredepart))) AS rank
+           FROM etapeequipe e_1
+        )
+ SELECT rc.idequipe,
+    e.nomequipe,
+    rc.idcoureur,
+    c.nomcoureur,
+    c.numero,
+    rc.idetape,
+    rc.duree,
+    r.point,
+    r.idrang,
+    r.rang
+   FROM rankedcoureurs rc
+     JOIN rang r ON rc.rank = r.rang
+     JOIN coureur c ON rc.idcoureur = c.idcoureur
+     JOIN equipe e ON rc.idequipe = e.idequipe;
+
+viewequipecoureur
+
+ viewadminetap
+ SELECT equipe.idequipe,
+    equipe.nomequipe,
+    coureur.idcoureur,
+    coureur.nomcoureur,
+    coureur.numero,
+    coureur.genre,
+    coureur.datedenaissance,
+    categorie.idcate,
+    categorie.nomcate
+   FROM equipe
+     JOIN equipecoureur ON equipecoureur.idequipe = equipe.idequipe
+     JOIN coureur ON equipecoureur.idcoureur = coureur.idcoureur
+     JOIN categorie ON coureur.idcategorie = categorie.idcate;
+
+viewlogin
+
+ SELECT admin.idadmin,
+    admin.nomadmin,
+    admin.idlogin,
+    equipe.idequipe,
+    equipe.nomequipe,
+    login.idlog,
+    login.pass,
+    login.statu
+   FROM admin
+     FULL JOIN login ON login.idlog = admin.idlogin
+     FULL JOIN equipe ON login.idlog = equipe.idlogin;
+
+

@@ -5,6 +5,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\EquipeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClassementController;
+use App\Http\Controllers\ImportController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,15 @@ Route::get('/indexadmin', function () {
 Route::get('/classementbyetape', function () {
     return view('classement/classementbyetape');
 })->name('classementbyetape');
+
+Route::get('/importcsvetaperesult', function () {
+    return view('import/importcsvetaperesult');
+})->name('importcsvetaperesult');
+
+Route::get('/importcsvpoint', function () {
+    return view('import/importcsvpoint');
+})->name('importcsvpoint');
+
 
 Route::get('/equipedetailetape/{idetape}', [EquipeController::class, 'equipedetailetape'])->name('equipedetailetape');
 
@@ -41,6 +51,12 @@ Route::get('/equipedetailetape/{idetape}', [EquipeController::class, 'equipedeta
 Route::get('/classementdetailetape/{idetape}', [ClassementController::class, 'classementdetailetape'])->name('classementdetailetape');    
 
 Route::get('/classementbyequipe', [ClassementController::class, 'classementbyequipe'])->name('classementbyequipe');
+
+Route::post('/importdonnee', [ImportController::class, 'importdonnee'])->name('importdonnee');
+
+Route::post('/importpoint', [ImportController::class, 'importpoint'])->name('importpoint');
+
+
 
 Route::get('/404', function () {
     return view('404');

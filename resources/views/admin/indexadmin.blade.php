@@ -28,6 +28,12 @@
                             <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-contact" type="button" role="tab"
                                 aria-controls="nav-contact" aria-selected="false"><a href="{{ route('classementbyequipe') }}">classement par equipe</a></button> 
+                            <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-contact" type="button" role="tab"
+                                aria-controls="nav-contact" aria-selected="false"><a href="{{ route('importcsvetaperesult') }}">Importation donnée</a></button> 
+                            <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-contact" type="button" role="tab"
+                                aria-controls="nav-contact" aria-selected="false"><a href="{{ route('importcsvpoint') }}">Importation point</a></button> 
                         <a class="btn btn-sm btn-primary" href="{{ route('logoutadmin') }}">Deconnect</a>
                         </div>
                     </nav>

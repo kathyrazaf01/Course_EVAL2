@@ -43,14 +43,41 @@ class EquipeController extends Controller
         $idcoureur = $request->coureurs;
         $idequipe = session('idequipe');
 
-        $insertfunction =$this->etape->insertioncoureur($idetape,$idcoureur,$idequipe);
-        $nbrcoureur = DB::select('select nbcoureur from etape where idetape ='.$idetape);
+        $idcoureurimp = implode(",", $idcoureur);
 
-        if ($insertfunction == true) {
-            return redirect()->route('indexclient')->with('success', 'Runners added with succes');
-        } else {
-            return redirect()->route('indexclient')->with('error', 'Should insert '.$nbrcoureur[0]->nbcoureur.' Runners ');
-        }
+        echo $idetape;
+        echo $idequipe;
+
+        DB::select('INSERT INTO public.etapeequipe(idetape) values('.$idetape.')');
+
+         //insert equipe et coureur
+        DB::select('INSERT INTO public.etapeequipe(idequipe, idcoureur)
+        select idequipe,idcoureur from viewequipecoureur where idcoureur in ('.$idcoureurimp.')');
+
+        //  //supprimer etape où idequipe est NULL
+        // DB::select('DELETE FROM etapeequipe
+        // WHERE idetape = '.$idetape.' AND idequipe IS NULL;');
+
+        $nbrcoureur = DB::select('select nbcoureur from etape where idetape ='.$idetape);
+        $countcoureur = DB::select('select count(idcoureur) from etapeequipe where idequipe ='.$idequipe.' and idcoureur in ('.$idcoureurimp.') group by idequipe ');
+
+        // if ($nbrcoureur[0]->nbcoureur <= $countcoureur[0]->count ){ 
+        //     DB::select('delete from etapeequipe where idequipe ='.$idequipe.' and idcoureur in('.$idcoureurimp.')');
+        //     return redirect()->route('indexclient')->with('error', 'Should insert '.$nbrcoureur[0]->nbcoureur.' Runners ');
+        // }else{
+        //     return redirect()->route('indexclient')->with('success', 'Runners added with succes');
+        // }
+
+
+
+        // $insertfunction =$this->etape->insertioncoureur($idetape,$idcoureur,$idequipe);
+
+
+        // if ($insertfunction == true) {
+        //     return redirect()->route('indexclient')->with('success', 'Runners added with succes');
+        // } else {
+        //     return redirect()->route('indexclient')->with('error', 'Should insert '.$nbrcoureur[0]->nbcoureur.' Runners ');
+        // }
        
     }
 }
