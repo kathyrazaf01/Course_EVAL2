@@ -1096,3 +1096,99 @@ viewlogin
      FULL JOIN equipe ON login.idlog = equipe.idlogin;
 
 
+INSERT INTO etapeequipe (idetape, idequipe, idcoureur, arrivee)
+SELECT e.idetape, ec.idequipe, c.id AS idcoureur, ir.arrivee
+FROM etape e
+JOIN equipe ec ON e.nometape = ec.nomequipe -- Assurez-vous que le nom de l'étape correspond au nom de l'équipe
+JOIN importcsvresultat ir ON CAST(ir.arrivée AS time) = e.heuredepart -- Convertir `ir.arrivee` en `time`
+JOIN coureur c ON c.numero = ir.numero_dossard AND c.nomcoureur = ir.nom; -- Supposons que le nom du coureur dans coureur correspond au nom dans importcsvresultat
+
+viewetapeequipe
+select e.idetape,
+e.nometape,
+e.rang,
+e.datedepart,
+e.heuredepart,
+eq.idequipe,
+eq.nomequipe,
+c.idcoureur,
+c.nomcoureur,
+c.datedenaissance,
+c.genre,
+c.numero,
+et.arrivee
+from etape e
+join etapeequipe et on et.idetape = e.idetape
+join coureur c on et.idcoureur = c.idcoureur
+join equipe eq on et.idequipe = eq.idequipe
+
+
+classement TEMP
+with rankedcoureurs as(
+		select
+	rangetape,
+	nomequipe,
+	idcoureur,
+	idetape,
+	idequipe,
+	nomcoureur,
+	genre,
+	EXTRACT(YEAR FROM AGE(current_date, datedenaissance)) AS age,
+	arrivee - to_timestamp((datedepart || ' '::text) || heuredepart, 'YYYY-MM-DD HH24:MI:SS'::text)::timestamp without time zone as duree,
+	RANK() OVER (PARTITION BY nometape order by arrivee - to_timestamp((datedepart || ' '::text) || heuredepart, 'YYYY-MM-DD HH24:MI:SS'::text)::timestamp without time zone )as rank 
+	from viewetapeequipe order by nomequipe
+)
+SELECT rc.idequipe,
+    e.nomequipe,
+    rc.idcoureur,
+    c.nomcoureur,
+    c.numero,
+    c.genre,
+	rc.age,
+    rc.idetape,
+    rc.duree,
+    r.point,
+    r.rang
+   FROM rankedcoureurs rc
+     JOIN rang r ON rc.rank = r.rang
+     JOIN coureur c ON rc.idcoureur = c.idcoureur
+     JOIN equipe e ON rc.idequipe = e.idequipe order by e.nomequipe;
+
+
+official classement
+
+with rankedcoureurs as (select 
+	rangetape,
+	nomequipe,
+	idcoureur,
+	idetape,
+	idequipe,
+	nomcoureur,	
+	duree,
+	age,
+	genre,
+	RANK() OVER (PARTITION BY nometape order by duree)as rank
+from viewresultat )
+
+SELECT 
+r.idrang,
+rc.idetape,
+rc.rangetape,
+	rc.idequipe,
+	rc.nomequipe,
+	rc.idcoureur,
+	rc.nomcoureur,
+	rc.age,
+	rc.genre,
+	rc.duree,
+	r.rang,
+	COALESCE(r.point, 0) AS point
+   FROM rang r
+   FULL JOIN  rankedcoureurs rc ON rc.rank = r.rang
+   
+
+
+
+
+-- SELECT * 
+-- 	FROM public.etapeequipe;

@@ -1,0 +1,61 @@
+public function importCsv()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login'); 
+        }
+        $user = Auth::user();
+        
+        $file = request()->file('resultatFile');
+        $fileContents = file($file->getPathname());
+        $row = 0;
+        foreach ($fileContents as $line) {
+            $row++;
+    
+            // Si c'est la première ligne, sautez-la
+            if ($row == 1) {
+                continue;
+            } 
+            
+            $data = str_getcsv($line);
+            
+            $formatdDateNaissance = Carbon::createFromFormat('d/m/Y', $data[4])->format('Y-m-d');
+            $formatdDateArrivee = Carbon::createFromFormat('d/m/Y H:i:s', $data[6])->format('Y-m-d H:i:s');
+            // Insérer dans la base de données
+            DB::table('importresultat')->insert([
+                'etaperang' => $data[0],
+                'numerodossar' => $data[1],
+                'nom' => $data[2],
+                'genre' => $data[3],
+                'datenaissance' => $formatdDateNaissance,
+                'equipe' => $data[5],
+                'arrivee' => $formatdDateArrivee,
+                
+            ]);
+        }
+        DB::statement('INSERT INTO equipe (identifiant,nomequipe,password)
+        SELECT DISTINCT im.equipe,im.equipe,im.equipe
+        FROM importresultat im
+        WHERE (im.equipe,im.equipe,im.equipe) NOT IN (SELECT identifiant,nomequipe,password FROM equipe)');
+        
+        DB::statement('INSERT INTO coureur (nomcoureur,numero,genre,datenaissance,idequipe)
+        SELECT DISTINCT im.nom,im.numerodossar,im.genre,im.datenaissance,e.idequipe
+        FROM importresultat im
+        INNER JOIN equipe e on e.nomequipe = im.equipe
+        WHERE (im.nom,im.numerodossar,im.genre,im.datenaissance,e.idequipe) NOT IN (SELECT nomcoureur,numero,genre,datenaissance,idequipe FROM coureur)');
+        
+        DB::statement('INSERT INTO etapecoureur (idetape,idcoureur)
+        SELECT DISTINCT et.idetape,c.idcoureur
+        FROM importresultat im
+        INNER JOIN coureur c ON c.nomcoureur = im.nom
+        INNER JOIN etape et ON et.rang = im.etaperang
+        WHERE (et.idetape,c.idcoureur) NOT IN (SELECT idetape, idcoureur FROM etapecoureur)');
+
+        DB::statement('INSERT INTO resultatcoureur (idcoureur,idetape,heuredebut,heurefin,duree)
+        SELECT DISTINCT c.idcoureur,et.idetape,et.heuredebut,im.arrivee,(im.arrivee-heuredebut)::time
+        FROM importresultat im
+        INNER JOIN coureur c ON c.nomcoureur = im.nom
+        INNER JOIN etape et ON et.rang = im.etaperang
+        WHERE (c.idcoureur,et.idetape,et.heuredebut,im.arrivee,(im.arrivee-heuredebut)::time) NOT IN (SELECT idcoureur,idetape,heuredebut,heurefin,duree FROM resultatcoureur)');
+
+        return view('html.importDonnee');  
+    }

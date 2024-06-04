@@ -35,4 +35,6 @@ class Admin extends Model
         // WHERE idcoureur = ?", [$heuredepard, $heurearrivée, $idcoureur]);
         // return $temps;
     }
+
+  
 }

@@ -56,6 +56,8 @@ Route::post('/importdonnee', [ImportController::class, 'importdonnee'])->name('i
 
 Route::post('/importpoint', [ImportController::class, 'importpoint'])->name('importpoint');
 
+Route::get('/categorygenerate', [AdminController::class, 'categorygenerate'])->name('categorygenerate');
+
 
 
 Route::get('/404', function () {

@@ -11,14 +11,19 @@
             <!-- Recent Sales Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="bg-secondary text-center rounded p-4">
-                    {{-- @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
+                   
+                    @if(session('succes'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('succes') }}
+                    </div>
                     @endif
-                    @if (session('error'))
+
+                    @if (session('status'))
                         <div class="alert alert-primary" role="alert">
-                            {{ session('error') }}
+                            {{ session('status') }}
                         </div>
-                    @endif --}}
+                    @endif
+                    
 
                     <nav>
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -33,8 +38,9 @@
                                 aria-controls="nav-contact" aria-selected="false"><a href="{{ route('importcsvetaperesult') }}">Importation donnée</a></button> 
                             <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-contact" type="button" role="tab"
-                                aria-controls="nav-contact" aria-selected="false"><a href="{{ route('importcsvpoint') }}">Importation point</a></button> 
-                        <a class="btn btn-sm btn-primary" href="{{ route('logoutadmin') }}">Deconnect</a>
+                                aria-controls="nav-contact" aria-selected="false">
+                            <a class="btn btn-success m-2" href="{{ route('categorygenerate') }}">Category generator</a>
+                            <a class="btn btn-sm btn-primary" href="{{ route('logoutadmin') }}">Deconnect</a>
                         </div>
                     </nav>
                     <div class="p-4"></div>

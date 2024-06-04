@@ -18,27 +18,87 @@ class LoginController extends Controller
         if (empty($login) || empty($password)) {
             return redirect()->back()->with('error', 'fill both fields');
         }
-        $user = DB::table('viewlogin')
-            ->where(function ($query) use ($login) {
-                $query->where('nomequipe', $login)
-                    ->orWhere('nomadmin', $login);
-            })
-            ->where('pass', $password)
-            ->first();
-  
 
-        if ($user) {
-            if($user->statu == 1) {
-                Session::put('idequipe', $user->idequipe);
-                return redirect('indexclient');
-            }elseif ($user->statu == 0) {
-                Session::put('idadmin', $user->idadmin);
-                return redirect('indexadmin');
-            }
-        }
-        else {
-            // L'utilisateur n'existe pas, redirigez vers la page de connexion avec un message d'erreur
+
+        $admin = DB::table('admin')
+            ->where('nomadmin', $login)
+            ->where('nomadmin', $password)
+            ->first();
+
+        if (empty($admin)) {
             return redirect()->back()->with('error', 'wrong password or email');
         }
+
+        if($admin) {
+            Session::put('idadmin', $admin->idadmin);
+            return redirect('indexadmin');
+        }
+
+
+        //   if ($admin) {
+        //         Session::put('idequipe', $user->idadmin);
+        //         return redirect('indexadmin');
+
+        // }
+        // else {
+        //     // L'utilisateur n'existe pas, redirigez vers la page de connexion avec un message d'erreur
+        //     return redirect()->back()->with('error', 'wrong password or email');
+        // }
+
+         // if ($user) {
+        //     if($user->statu == 1) {
+        //         Session::put('idequipe', $user->idequipe);
+        //         return redirect('indexclient');
+        //     }elseif ($user->statu == 0) {
+        //         Session::put('idadmin', $user->idadmin);
+        //         return redirect('indexadmin');
+        //     }
+        // }
+        // else {
+        //     // L'utilisateur n'existe pas, redirigez vers la page de connexion avec un message d'erreur
+        //     return redirect()->back()->with('error', 'wrong password or email');
+        // }
+
+        // if(!$user) {
+        //     $user = DB::table('equipe')
+        //         ->where('nomequipe', $login)
+        //         ->where('motdepasse', $password)
+        //         ->first();
+        // }
+
+        // if(!$user) {
+        //     return redirect()->back()->with('error', 'wrong password or email');
+        // }
+        // $admin = DB::table('admin')
+        //     ->where('nomadmin', $login)
+        //     ->first();
+        
+        // $equipe = DB::table('equipe')
+        //     ->where('nomequipe', $login)
+        //     ->first();
+
+        // if ($admin || $equipe) {
+        //     if($us->statu == 1) {
+        //         //         Session::put('idequipe', $user->idequipe);
+        //         //         return redirect('indexclient');
+        //         //     }elseif ($user->statu == 0) {
+        //         //         Session::put('idadmin', $user->idadmin);
+        //         //         return redirect('indexadmin');
+        // }
+        
+
+        // if ($user) {
+        //     if($user->statu == 1) {
+        //         Session::put('idequipe', $user->idequipe);
+        //         return redirect('indexclient');
+        //     }elseif ($user->statu == 0) {
+        //         Session::put('idadmin', $user->idadmin);
+        //         return redirect('indexadmin');
+        //     }
+        // }
+        // else {
+        //     // L'utilisateur n'existe pas, redirigez vers la page de connexion avec un message d'erreur
+        //     return redirect()->back()->with('error', 'wrong password or email');
+        // }
     }
 }

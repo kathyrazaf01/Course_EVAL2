@@ -80,7 +80,7 @@ class ImportController extends Controller
 
         $idetape = DB::select('
         WITH new_etapes AS (
-            INSERT INTO etape (nometape,longueur,nbcoureur,rang,datedepart,heuredepart)
+            INSERT INTO etape (nometape,longueur,nbcoureur,rangetape,datedepart,heuredepart)
             SELECT DISTINCT et.etape,et.longueur,et.nbcoureur,et.rang,et.date_depart,heure_depart
             FROM importcsvetape et
             WHERE "etape" NOT IN (SELECT nometape FROM etape)
@@ -174,33 +174,32 @@ class ImportController extends Controller
             SELECT DISTINCT rs.equipe
             FROM importcsvresultat rs
             WHERE "equipe" NOT IN (SELECT nomequipe FROM equipe)
-            RETURNING idequipe,nomequipe;
+            RETURNING idequipe;
         ');
 
-        $equipecoureur = DB::select('
-            WITH new_coureur AS(
-                select idcoureur
-                from coureur
-                where nomcoureur in (select DISTINCT "nom" importcsvresultat)
-            )
-            WITH new_equipe AS(
-                select idequipe,nomequipe
-                from equipe 
-                where nomequipe in (select DISTINCT "equipe" importcsvresultat)
-            )
+        $idequipe = DB::select('
+        INSERT INTO equipe (nomequipe)
+        SELECT DISTINCT rs.equipe
+        FROM importcsvresultat rs
+        WHERE "equipe" NOT IN (SELECT nomequipe FROM equipe)
+        RETURNING idequipe;
+    ');
 
-            INSERT into equipecoureur (idequipe)
-                select equipe.idequipe
-                from new_equipe 
-
-            INSERT into equipecoureur (idcoureur)
-                select coureur.idcoureur
-                from new_equipe equipe
-                join equipecoureur on equipecoureur.idequipe = equipe.idequipe
-                join new_coureur coureur on equipecoureur.idcoureur = coureur.idcoureur 
-        ');
-
-       
+    $idequipecoureur = DB::select('
+    INSERT INTO equipecoureur (idcoureur, idequipe)
+    SELECT c.idcoureur, e.idequipe
+    FROM importcsvresultat ir
+    JOIN coureur c ON ir.nom = c.nomcoureur
+    JOIN equipe e ON ir.equipe = e.nomequipe where idcoureur not in(select idcoureur from equipecoureur);');
+    
+    $idequipecoureur = DB::select('insert into etapeequipe(idequipe,idcoureur,idetape,arrivee)
+    SELECT DISTINCT e.idequipe,c.idcoureur,et.idetape,im.arrivée
+            FROM importcsvresultat im
+            INNER JOIN coureur c ON c.nomcoureur = im.nom
+            INNER JOIN etape et ON et.rang = im.etape_rang
+            INNER JOIN equipe e ON e.nomequipe = im.equipe
+            WHERE (c.idcoureur,et.idetape) NOT IN (SELECT idcoureur,idetape FROM etapeequipe)');
+        
     }
 
     public function importpoint(Request $request){

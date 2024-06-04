@@ -78,4 +78,29 @@ class AdminController extends Controller
 
 
     }
+
+    public function categorygenerate(){
+        $male = DB::select("SELECT distinct genre FROM coureur where genre = 'M'");
+        $female = DB::select("SELECT distinct genre FROM coureur where genre = 'F'");
+
+        $insertgenre = DB::select("insert into categorie (nomcate) select distinct genre from coureur where genre not in(select nomcate from categorie)");
+
+        $senior = DB::table('categorie')
+        ->where('nomcate','senior')
+        ->first();
+
+        $junior = DB::table('categorie')
+        ->where('nomcate','junior')
+        ->first();
+
+        if($senior || $junior) {
+          echo "Catégorie déja existante";
+        }
+        
+        if(!$senior || !$junior) {
+            DB::select("insert into categorie (nomcate) values ('senior'), ('junior')");
+            return back()->with('succes', 'Catégorie insérée avec succes');
+        } 
+        
+    }
 }
